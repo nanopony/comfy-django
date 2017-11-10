@@ -4,7 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./main.less"
 
-const App = () => <div>It's alive!</div>;
+const App = () => <div className="test-style">It's alive!</div>;
 
 ReactDOM.render(
     <App/>,
