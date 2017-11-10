@@ -7,8 +7,16 @@
 *.pyc
 __pycache__/
 local_settings.py
+
 db.sqlite3
 media
+
+#virtualenv
+ve/
+
+#local settings
+
+app/settings/local.py
 
 ### Node ###
 # Logs
