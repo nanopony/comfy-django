@@ -49,18 +49,18 @@ ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
-        'BACKEND' : 'django.template.backends.django.DjangoTemplates',
-        'DIRS'    : [os.path.join(PROJECT_ROOT, 'templates')],
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(PROJECT_ROOT, 'templates')],
         'APP_DIRS': True,
-        'OPTIONS' : {
-            'debug'             : DEBUG,
+        'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'string_if_invalid' : '<< MISSING VARIABLE "%s" >>' if DEBUG else ''
+            'string_if_invalid': '<< MISSING VARIABLE "%s" >>' if DEBUG else ''
         },
     },
 ]
@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME'  : os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -135,11 +135,11 @@ REST_FRAMEWORK = {
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'CACHE'          : not DEBUG,
+        'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE'     : os.path.join(PROJECT_ROOT, 'webpack-stats.json'),
-        'POLL_INTERVAL'  : 0.1,
-        'IGNORE'         : [
+        'STATS_FILE': os.path.join(PROJECT_ROOT, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': [
             r'.+\.hot-update\.js',
             r'.+\.map']
     }

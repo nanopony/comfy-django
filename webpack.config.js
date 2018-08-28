@@ -1,26 +1,25 @@
-var path = require('path');
-var webpack = require('webpack');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var BundleTracker = require('webpack-bundle-tracker');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-var Uglify = require("uglifyjs-webpack-plugin");
+const path = require('path'),
+    webpack = require('webpack'),
+    HtmlWebpackPlugin = require('html-webpack-plugin'),
+    BundleTracker = require('webpack-bundle-tracker'),
+    Uglify = require("uglifyjs-webpack-plugin"),
+    ManifestPlugin = require('webpack-manifest-plugin'),
+    MiniCssExtractPlugin = require("mini-css-extract-plugin"),
+    WebpackMd5Hash = require('webpack-md5-hash');
+
 // var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-var providePlugin = new webpack.ProvidePlugin({
-    $: 'jquery',
-    '_': 'lodash',
-    jQuery: 'jquery',
-    'window.jQuery': 'jquery',
-});
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+var providePlugin = new webpack.ProvidePlugin({});
 
 
 module.exports = {
+    mode: IS_PRODUCTION ? 'production' : 'development',
     entry: {
         vendor: [
             'react',
             'bootstrap',
-            'jquery',
-            'jquery.cookie'
         ],
         main: './assets/src/main.jsx',
     },
@@ -29,51 +28,63 @@ module.exports = {
         new webpack.NamedModulesPlugin(),
         providePlugin,
         new BundleTracker({filename: './webpack-stats.json'}),
-        new ExtractTextPlugin("styles.css")
+        new MiniCssExtractPlugin({
+            filename: '[name].[contenthash].css'
+        }),
+        new ManifestPlugin({
+            fileName: 'manifest.json'
+        }),
+        new WebpackMd5Hash()
     ],
     output: {
         path: path.resolve(__dirname, './assets/bundles/'),
-        // publicPath: '/dist/',
         filename: '[name].js',
         publicPath: 'http://localhost:1988/assets/bundles/'
     },
 
     module: {
-        loaders: [
+        rules: [
             {
-                test: /\.(jpe?g|gif|png)$/,
-                loader: 'file-loader?emitFile=false&name=[path][name].[ext]'
+                test: /\.(jpe?g|gif|png|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                use: {
+                    loader: 'file-loader?emitFile=false&name=[path][name].[ext]'
+                }
             },
-            {test: /\.css$/, loader: 'style-loader!css-loader'},
             {
                 test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader?limit=10000&mimetype=application/font-woff"
+                use: {
+                    loader: "url-loader?limit=10000&mimetype=application/font-woff"
+                }
             },
-            {test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader"},
             {
-                test: /\.js$/,
+                test: /\.j(s|sx)$/,
                 include: path.join(__dirname, 'assets/src'),
-                loader: 'babel-loader'
-            },
-            {
-                test: /\.jsx$/,
-                loader: 'babel-loader',
-                include: path.join(__dirname, 'assets/src')
-            },
-            {
-                test: /\.less$/,
-                loader: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: "css-loader!autoprefixer-loader!less-loader"
-                })
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        'presets': [
 
+                            ["@babel/preset-env",
+                                {
+                                    "targets": "> 1%, not dead"
+                                }],
+                            "@babel/preset-react",
+                        ],
+                        'plugins': [
+                            "@babel/plugin-proposal-export-default-from",
+                            ["@babel/plugin-proposal-decorators", {"legacy": true}],
+                        ]
+                    }
+                }
             },
             {
-                test: /\.scss$/,
-                loader: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: "css-loader!autoprefixer-loader!sass-loader"
-                })
+                test: /\.(s)?css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'postcss-loader',
+                    'sass-loader'
+                ]
 
             }
         ]
@@ -92,14 +103,4 @@ module.exports = {
 
 };
 
-if (process.env.NODE_ENV === 'production') {
-    module.exports.devtool = 'cheap-module-source-map';
-    module.exports.plugins = (module.exports.plugins || []).concat([
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: '"production"'
-            }
-        }),
-        new Uglify()
-    ])
-}
+

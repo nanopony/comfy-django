@@ -1,6 +1,0 @@
-{
-    "presets":[
-        "es2016", "react", "stage-1"
-    ],
-    "plugins": ["transform-decorators-legacy", "mobx-deep-action"]
-}
